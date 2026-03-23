@@ -1,0 +1,29 @@
+# Node / front-end
+frontend-vue/node_modules/
+frontend-vue/dist/
+frontend-vue/.vite/
+frontend-vue/.DS_Store
+
+# Java / back-end
+backend/target/
+backend/.idea/
+
+# OS / editor
+.idea/
+.vscode/
+.cursor/
+
+# Logs / crash dumps
+*.log
+hs_err_pid*.log
+replay_pid*.log
+replay_pid*.txt
+
+# Env / secrets
+.env
+.env.*
+
+# Mac/Windows artifacts
+Thumbs.db
+Desktop.ini
+
