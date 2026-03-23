@@ -34,6 +34,7 @@
 import { computed, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getJson } from '../api/client'
+import { setSeoMeta } from '../utils/seo'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,6 +67,15 @@ onMounted(async () => {
     ])
     state.categories = categoriesRes
     state.products = productsRes
+
+    const c = Array.isArray(categoriesRes)
+      ? categoriesRes.find(x => x.id === categoryId.value)
+      : null
+    setSeoMeta({
+      title: (c && c.name ? c.name : '分类') + ' - 农村红木家具',
+      description: '',
+      url: window.location.href
+    })
   } catch (e) {
     console.error(e)
     alert('加载失败，请稍后再试。')

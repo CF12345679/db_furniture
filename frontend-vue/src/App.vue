@@ -6,6 +6,7 @@
         <nav style="display: flex; gap: 10px; font-size: 13px;">
           <RouterLink to="/" style="color: #333; text-decoration: none;">首页</RouterLink>
           <RouterLink to="/contact" style="color: #333; text-decoration: none;">联系</RouterLink>
+          <RouterLink to="/about" style="color: #333; text-decoration: none;">关于</RouterLink>
           <RouterLink to="/inquiry" style="color: #333; text-decoration: none;">咨询</RouterLink>
         </nav>
       </div>

@@ -1,16 +1,17 @@
-export async function getJson(url) {
-  const res = await fetch(url, { method: 'GET' })
+export async function getJson(url, options = {}) {
+  const res = await fetch(url, { method: 'GET', ...options })
   if (!res.ok) {
     throw new Error(`GET ${url} failed: ${res.status}`)
   }
   return res.json()
 }
 
-export async function postJson(url, body) {
+export async function postJson(url, body, options = {}) {
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     body: JSON.stringify(body)
+    // 其它选项（如 headers）通过 options.headers 注入
   })
 
   // 失败时也尽量返回 JSON 以便显示后端 message
@@ -27,10 +28,10 @@ export async function postJson(url, body) {
   return json
 }
 
-export async function putJson(url, body) {
+export async function putJson(url, body, options = {}) {
   const res = await fetch(url, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     body: JSON.stringify(body)
   })
 

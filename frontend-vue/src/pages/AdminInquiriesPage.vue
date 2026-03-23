@@ -74,6 +74,8 @@ const state = reactive({
   toastError: ''
 })
 
+const adminToken = localStorage.getItem('admin_token') || ''
+
 const loading = computed(() => state.loading)
 const inquiries = computed(() => state.inquiries)
 const toast = computed(() => state.toast)
@@ -91,7 +93,8 @@ async function refresh() {
   state.toastError = ''
   state.loading = true
   try {
-    const list = await getJson('/api/admin/inquiries')
+    if (!adminToken) throw new Error('未登录，请先到管理员登录页')
+    const list = await getJson('/api/admin/inquiries', { headers: { 'X-Admin-Token': adminToken } })
     state.inquiries = Array.isArray(list) ? list : []
   } catch (e) {
     state.toastError = e.message || '加载失败'
@@ -104,7 +107,12 @@ async function update(id, status) {
   state.toast = ''
   state.toastError = ''
   try {
-    await putJson(`/api/admin/inquiries/${encodeURIComponent(id)}`, { status })
+    if (!adminToken) throw new Error('未登录，请先到管理员登录页')
+    await putJson(
+      `/api/admin/inquiries/${encodeURIComponent(id)}`,
+      { status },
+      { headers: { 'X-Admin-Token': adminToken } }
+    )
     state.toast = '更新成功'
     await refresh()
   } catch (e) {

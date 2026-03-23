@@ -70,7 +70,9 @@
 
 <script setup>
 import { computed, onMounted, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { getJson, postJson } from '../api/client'
+import { setSeoMeta } from '../utils/seo'
 
 const state = reactive({
   captcha: { captchaId: '', captchaImage: '' },
@@ -91,6 +93,8 @@ const submitting = computed(() => state.submitting)
 const form = computed(() => state.form)
 const message = computed(() => state.message)
 
+const router = useRouter()
+
 async function refreshCaptcha() {
   const c = await getJson('/api/captcha')
   state.captcha.captchaId = c.captchaId
@@ -99,6 +103,11 @@ async function refreshCaptcha() {
 }
 
 onMounted(async () => {
+  setSeoMeta({
+    title: '提交线索 - 农村红木家具',
+    description: '填写电话并通过图片验证码提交需求，我们将尽快联系你。',
+    url: window.location.href
+  })
   await refreshCaptcha()
 })
 
@@ -117,6 +126,7 @@ async function submit() {
     }
     await postJson('/api/inquiries', payload)
     state.message = { isError: false, text: '提交成功，等待联系' }
+    router.push('/inquiry/success')
   } catch (e) {
     const text = e.message || '提交失败'
     state.message = { isError: true, text }
