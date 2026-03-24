@@ -4,7 +4,7 @@ import com.dbfurniture.api.dto.BannerDTO;
 import com.dbfurniture.api.dto.CategoryDTO;
 import com.dbfurniture.api.dto.CompanyProfileDTO;
 import com.dbfurniture.api.dto.ProductDTO;
-import com.dbfurniture.service.InMemoryCatalogService;
+import com.dbfurniture.service.CatalogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,9 +25,9 @@ public class AdminCatalogController {
 
     private static final String ADMIN_TOKEN = "dev-admin-token";
 
-    private final InMemoryCatalogService catalogService;
+    private final CatalogService catalogService;
 
-    public AdminCatalogController(InMemoryCatalogService catalogService) {
+    public AdminCatalogController(CatalogService catalogService) {
         this.catalogService = catalogService;
     }
 

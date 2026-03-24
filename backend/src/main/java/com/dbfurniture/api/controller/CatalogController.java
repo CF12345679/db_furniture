@@ -5,7 +5,7 @@ import com.dbfurniture.api.dto.CaseReviewDTO;
 import com.dbfurniture.api.dto.CategoryDTO;
 import com.dbfurniture.api.dto.CompanyProfileDTO;
 import com.dbfurniture.api.dto.ProductDTO;
-import com.dbfurniture.service.InMemoryCatalogService;
+import com.dbfurniture.service.CatalogService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +18,9 @@ import java.util.List;
 @RequestMapping("/api")
 public class CatalogController {
 
-    private final InMemoryCatalogService catalogService;
+    private final CatalogService catalogService;
 
-    public CatalogController(InMemoryCatalogService catalogService) {
+    public CatalogController(CatalogService catalogService) {
         this.catalogService = catalogService;
     }
 

@@ -1,0 +1,104 @@
+-- 数据库初始化脚本 (schema.sql)
+-- 适配 MySQL 8.x
+
+-- 1. 分类表
+CREATE TABLE IF NOT EXISTS categories (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    sort INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 2. 产品表
+CREATE TABLE IF NOT EXISTS products (
+    id VARCHAR(36) PRIMARY KEY,
+    category_id VARCHAR(36),
+    title VARCHAR(200) NOT NULL,
+    summary TEXT,
+    materials_craft TEXT,
+    specs TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    sort INT DEFAULT 0,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3. 产品图片关联表 (一对多)
+CREATE TABLE IF NOT EXISTS product_images (
+    product_id VARCHAR(36) NOT NULL,
+    image_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (product_id, image_id),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 4. 轮播图表
+CREATE TABLE IF NOT EXISTS banners (
+    id VARCHAR(36) PRIMARY KEY,
+    title VARCHAR(200),
+    link_type VARCHAR(50),
+    link_value VARCHAR(255),
+    image_id VARCHAR(255) NOT NULL,
+    sort INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 5. 案例/评价表
+CREATE TABLE IF NOT EXISTS case_reviews (
+    id VARCHAR(36) PRIMARY KEY,
+    title VARCHAR(200),
+    content TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    sort INT DEFAULT 0,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 6. 案例图片关联表 (一对多)
+CREATE TABLE IF NOT EXISTS case_review_images (
+    case_review_id VARCHAR(36) NOT NULL,
+    image_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (case_review_id, image_id),
+    FOREIGN KEY (case_review_id) REFERENCES case_reviews(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 7. 线索表
+CREATE TABLE IF NOT EXISTS inquiries (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(100),
+    phone VARCHAR(20) NOT NULL,
+    region VARCHAR(200),
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'NEW',
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 8. 门店/品牌配置表 (通常只有一条记录)
+CREATE TABLE IF NOT EXISTS company_profile (
+    id VARCHAR(36) PRIMARY KEY,
+    company_name VARCHAR(200),
+    phone VARCHAR(50),
+    address VARCHAR(500),
+    we_chat VARCHAR(100),
+    we_chat_qr_image_id VARCHAR(255),
+    nav_lat DOUBLE,
+    nav_lng DOUBLE,
+    seo_title VARCHAR(200),
+    seo_description TEXT,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 9. 管理员表 (MVP 单用户)
+CREATE TABLE IF NOT EXISTS admin_users (
+    id VARCHAR(36) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

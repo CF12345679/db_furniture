@@ -2,59 +2,59 @@ package com.dbfurniture.service;
 
 import com.dbfurniture.api.dto.InquiryDTO;
 import com.dbfurniture.api.dto.InquirySubmitRequest;
+import com.dbfurniture.entity.Inquiry;
+import com.dbfurniture.repository.InquiryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Service
 public class InquiryService {
 
-    private final List<InquiryDTO> inquiries = new CopyOnWriteArrayList<>();
+    private final InquiryRepository inquiryRepository;
 
-    public InquiryService() {
-        // MVP 占位：让你能立即在管理端看到线索列表并验证“改状态”功能
-        InquiryDTO demo = new InquiryDTO();
-        demo.id = "demo-inquiry-1";
-        demo.name = "占位用户";
-        demo.phone = "13800000000";
-        demo.region = "XX省XX市";
-        demo.description = "占位：想了解红木餐桌/柜类。";
-        demo.status = "NEW";
-        demo.createdAt = Instant.now();
-        demo.updatedAt = demo.createdAt;
-        inquiries.add(demo);
+    public InquiryService(InquiryRepository inquiryRepository) {
+        this.inquiryRepository = inquiryRepository;
+        
+        // MVP 占位数据：如果数据库为空则初始化
+        if (inquiryRepository.count() == 0) {
+            Inquiry demo = new Inquiry();
+            demo.setId("demo-inquiry-1");
+            demo.setName("占位用户");
+            demo.setPhone("13800000000");
+            demo.setRegion("XX省XX市");
+            demo.setDescription("占位：想了解红木餐桌/柜类。");
+            demo.setStatus("NEW");
+            inquiryRepository.save(demo);
+        }
     }
 
+    @Transactional
     public InquiryDTO submit(InquirySubmitRequest req) {
-        InquiryDTO dto = new InquiryDTO();
-        dto.id = UUID.randomUUID().toString();
-        dto.name = req.name;
-        dto.phone = req.phone;
-        dto.region = req.region;
-        dto.description = req.description;
-        dto.status = "NEW";
-        dto.createdAt = Instant.now();
-        dto.updatedAt = dto.createdAt;
-        inquiries.add(dto);
-        return dto;
+        Inquiry entity = new Inquiry();
+        entity.setId(UUID.randomUUID().toString());
+        entity.setName(req.name);
+        entity.setPhone(req.phone);
+        entity.setRegion(req.region);
+        entity.setDescription(req.description);
+        entity.setStatus("NEW");
+        
+        return toDTO(inquiryRepository.save(entity));
     }
 
     public List<InquiryDTO> listAll() {
-        return inquiries;
+        return inquiryRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * 更新线索状态（MVP 内存版）。
-     * status 允许：NEW / CONTACTED / IGNORED
-     */
+    @Transactional
     public boolean updateStatus(String inquiryId, String status) {
-        if (inquiryId == null || inquiryId.trim().isEmpty()) {
-            return false;
-        }
-        if (status == null || status.trim().isEmpty()) {
+        if (inquiryId == null || inquiryId.trim().isEmpty() || status == null || status.trim().isEmpty()) {
             return false;
         }
 
@@ -64,14 +64,23 @@ public class InquiryService {
             return false;
         }
 
-        for (InquiryDTO dto : inquiries) {
-            if (inquiryId.equals(dto.id)) {
-                dto.status = normalized;
-                dto.updatedAt = Instant.now();
-                return true;
-            }
-        }
-        return false;
+        return inquiryRepository.findById(inquiryId).map(entity -> {
+            entity.setStatus(normalized);
+            inquiryRepository.save(entity);
+            return true;
+        }).orElse(false);
+    }
+
+    private InquiryDTO toDTO(Inquiry entity) {
+        InquiryDTO dto = new InquiryDTO();
+        dto.id = entity.getId();
+        dto.name = entity.getName();
+        dto.phone = entity.getPhone();
+        dto.region = entity.getRegion();
+        dto.description = entity.getDescription();
+        dto.status = entity.getStatus();
+        dto.createdAt = entity.getCreatedAt();
+        dto.updatedAt = entity.getUpdatedAt();
+        return dto;
     }
 }
-
